@@ -134,7 +134,7 @@ button{font:inherit;color:inherit}
 <div class="list" id="list-tweaking"></div>
 </section>
 </main>
-<footer class="foot"><p id="updated"></p><p>Tap ingredients and steps to check them off.</p></footer>
+<footer class="foot"><p id="updated"></p><p>Tap ingredients and steps to check them off.</p><p>Stock photos from <a href="https://unsplash.com" rel="noopener" target="_blank">Unsplash</a>.</p></footer>
 </div>
 <script>
 /* ------------------------------------------------------------------
@@ -146,15 +146,16 @@ button{font:inherit;color:inherit}
    Use serves: "4" or makes: "1 loaf". kind is the tag (Breakfast, Main...).
    linkOnly: true = just a link to the original, no ingredients or steps yet.
    Optional fields: source, tweaks, notes, estimated, protein, calories.
-   image: "images/<name>.jpg" — save a photo into the images folder next
-   to this file (any JPG or PNG, landscape works best).
+   image: a photo address. The current ones are free stock photos from
+   Unsplash. To use your own, save it in the images folder and write
+   image: "images/<name>.jpg" (any JPG or PNG, landscape works best).
 ------------------------------------------------------------------- */
 const UPDATED = "October 8, 2026";
 
 const RECIPES = [
   {
     id: "miso-lo-mein",
-    image: "images/miso-lo-mein.jpg",
+    image: "https://images.unsplash.com/photo-1634864572865-1cf8ff8bd23d?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Chicken Miso Lo Mein",
     status: "tweaking",
     blurb: "Spaghetti tossed in a white miso and mushroom sauce with seared chicken, shiitake, bok choy, jammy eggs and garlic chips.",
@@ -207,7 +208,7 @@ const RECIPES = [
   },
   {
     id: "ham-cheddar-chive-biscuits",
-    image: "images/ham-cheddar-chive-biscuits.jpg",
+    image: "https://images.unsplash.com/photo-1688783944974-fc8283c7c877?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Ham, Cheddar and Chive Cottage Cheese Biscuits",
     status: "tweaking",
     blurb: "Layered savory biscuits that hold well for a late breakfast. Delicious as is; we want more protein per calorie.",
@@ -260,7 +261,7 @@ const RECIPES = [
   /* ---------------- Locked in ---------------- */
   {
     id: "cottage-cheese-pumpkin-pancakes",
-    image: "images/pumpkin-pancakes.jpg",
+    image: "https://images.unsplash.com/photo-1680420572664-50c3a307c5db?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Cottage Cheese Pumpkin Pancakes",
     status: "locked",
     kind: "Breakfast",
@@ -293,7 +294,7 @@ const RECIPES = [
   },
   {
     id: "fluffy-french-toast",
-    image: "images/french-toast.jpg",
+    image: "https://images.unsplash.com/photo-1595044643502-616eeebbdff3?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Fluffy French Toast",
     status: "locked",
     kind: "Breakfast",
@@ -326,7 +327,7 @@ const RECIPES = [
   },
   {
     id: "cinnamon-maple-whiskey-sour",
-    image: "images/whiskey-sour.jpg",
+    image: "https://images.unsplash.com/photo-1713720441159-466472b29b54?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Cinnamon Maple Whiskey Sour",
     status: "locked",
     kind: "Drink",
@@ -353,7 +354,7 @@ const RECIPES = [
   },
   {
     id: "sweet-spicy-oven-ribs",
-    image: "images/oven-ribs.jpg",
+    image: "https://images.unsplash.com/photo-1761712826031-6456b87bd811?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Sweet and Spicy Oven-Baked Ribs",
     status: "locked",
     kind: "Main",
@@ -401,7 +402,7 @@ const RECIPES = [
   },
   {
     id: "easy-cajun-jambalaya",
-    image: "images/jambalaya.jpg",
+    image: "https://images.unsplash.com/photo-1612183078948-11291ada6356?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Easy Cajun Jambalaya",
     status: "locked",
     kind: "Main",
@@ -438,7 +439,7 @@ const RECIPES = [
   },
   {
     id: "dutch-oven-bread",
-    image: "images/dutch-oven-bread.jpg",
+    image: "https://images.unsplash.com/photo-1521471109507-43d61bb345dd?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Dutch Oven No-Knead Bread",
     status: "locked",
     kind: "Bread",
@@ -472,7 +473,7 @@ const RECIPES = [
   },
   {
     id: "carrot-cake-loaf",
-    image: "images/carrot-cake-loaf.jpg",
+    image: "https://images.unsplash.com/photo-1655552360629-2cbbb116727f?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Carrot Cake Loaf with Cream Cheese Frosting",
     status: "locked",
     kind: "Dessert",
@@ -516,7 +517,7 @@ const RECIPES = [
   },
   {
     id: "caldo-de-res",
-    image: "images/caldo-de-res.jpg",
+    image: "https://images.unsplash.com/photo-1664741662725-bd131742b7b7?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Caldo de Res (Mexican Beef Soup)",
     status: "locked",
     kind: "Main",
@@ -561,7 +562,7 @@ const RECIPES = [
   },
   {
     id: "turkey-gravy",
-    image: "images/turkey-gravy.jpg",
+    image: "https://images.unsplash.com/photo-1771161409359-d39dc768c2e9?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Turkey Gravy",
     status: "locked",
     kind: "Sauce",

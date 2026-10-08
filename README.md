@@ -5,7 +5,7 @@ A single-page recipe book. No build step, no dependencies. Works on GitHub Pages
 ## Files
 
 - `index.html` — the whole site: styles, recipe data, and rendering code.
-- `images/` — recipe photos. Each recipe's `image:` line names the file it expects (e.g. `images/jambalaya.jpg`). Landscape JPG or PNG. Until a file exists, the card shows a striped placeholder with the expected filename.
+- `images/` — your own recipe photos. Each recipe's `image:` line is a photo address. They currently point to free stock photos on Unsplash. To use your own photo, save a landscape JPG or PNG here and change that recipe's line to `image: "images/<name>.jpg"`. If a photo can't load, the card shows a striped placeholder.
 
 ## Publish on GitHub Pages
 
@@ -23,7 +23,7 @@ All recipes live in the `RECIPES` array near the top of the `<script>` in `index
 - `title`, `blurb`, `kind` (Breakfast, Main, Bread, Dessert, Drink, Sauce — any word; the filter chips build themselves from whatever kinds exist).
 - `status` — `"locked"` (final) or `"tweaking"` (still adjusting). Change it to move a recipe between sections.
 - `serves: "4"` or `makes: "1 loaf"`, `time`, optional `protein`, `calories`, `estimated: true`.
-- `image` — path to the photo.
+- `image` — photo address: an Unsplash link, or a path like `images/jambalaya.jpg`.
 - `ingredients` — array of `{ group: "Sauce", items: [...] }` (group optional).
 - `steps`, `notes`, `tweaks` (tweaks only display while status is `"tweaking"`).
 - `source: { label, url }` — original recipe link.

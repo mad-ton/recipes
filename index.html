@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chef It Up</title>
+<meta name="description" content="Our recipe book: the recipes we cook on repeat, and the ones we are still dialing in.">
+<meta name="theme-color" content="#f5efe6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16120f" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f5efe6;--surface:#fffcf7;--ink:#241b14;--muted:#6e6052;--rule:#e4d9ca;--accent:#b0482a;--locked:#3f6a45;--locked-wash:#e5ede2;--tweak:#9a5c0c;--tweak-wash:#f6e9d3;--display:"Young Serif",Georgia,"Times New Roman",serif;--body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--r:18px}
+@media (prefers-color-scheme:dark){:root{--paper:#16120f;--surface:#201a16;--ink:#f1e9df;--muted:#ab9d8e;--rule:#352c25;--accent:#e2805f;--locked:#8cc596;--locked-wash:#1f2b21;--tweak:#e5ac5a;--tweak-wash:#30251a}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+button{font:inherit;color:inherit}
+.page{max-width:1080px;margin:0 auto;padding:0 max(20px,env(safe-area-inset-left)) 96px}
+.masthead{padding:clamp(48px,10vw,104px) 0 clamp(28px,5vw,48px);display:grid;gap:18px}
+.eyebrow{margin:0;font-size:.8125rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.masthead h1{font-family:var(--display);font-weight:400;font-size:clamp(3.25rem,13vw,7.5rem);line-height:.9;letter-spacing:-.035em;margin:0}
+.masthead .lede{margin:0;max-width:40ch;color:var(--muted);font-size:clamp(1.0625rem,2.4vw,1.25rem);line-height:1.5;text-wrap:pretty}
+.tally{display:flex;flex-wrap:wrap;gap:8px 22px;margin:6px 0 0;padding:0;list-style:none;font-size:.9375rem;color:var(--muted)}
+.tally b{font-family:var(--display);font-weight:400;font-size:1.375rem;color:var(--ink);margin-right:6px}
+.tools{position:sticky;top:0;z-index:5;margin:0 calc(-1 * max(20px,env(safe-area-inset-left)));padding:12px max(20px,env(safe-area-inset-left));background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .2s;display:grid;gap:10px}
+.tools.stuck{border-bottom-color:var(--rule)}
+.search{position:relative}
+.search label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.search input{width:100%;font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:13px 20px 13px 46px;-webkit-appearance:none;appearance:none}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.search input::placeholder{color:var(--muted)}
+.search::before{content:"";position:absolute;left:19px;top:50%;width:13px;height:13px;margin-top:-8px;border:2px solid var(--muted);border-radius:50%}
+.search::after{content:"";position:absolute;left:32px;top:50%;width:2px;height:7px;margin-top:3px;background:var(--muted);transform:rotate(-45deg);border-radius:2px}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * max(20px,env(safe-area-inset-left)));padding:2px max(20px,env(safe-area-inset-left))}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:transparent;border-radius:999px;padding:7px 15px;font-size:.9375rem;font-weight:500;color:var(--muted);cursor:pointer;min-height:38px;transition:background .15s,color .15s,border-color .15s}
+.chip:hover{color:var(--ink);border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.shelf{padding-top:clamp(40px,7vw,64px);scroll-margin-top:110px}
+.shelf-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 20px;padding-bottom:16px;margin-bottom:22px;border-bottom:1px solid var(--ink)}
+.shelf-head h2{font-family:var(--display);font-weight:400;font-size:clamp(1.75rem,5vw,2.375rem);line-height:1.05;letter-spacing:-.015em;margin:0;display:flex;align-items:center;gap:12px}
+.shelf-head h2::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--locked);flex:none}
+.shelf[data-status="tweaking"] .shelf-head h2::before{background:transparent;border:2px dashed var(--tweak)}
+.shelf-head p{margin:0;color:var(--muted)}
+.shelf-head .count{font-weight:500;color:var(--ink)}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:22px;align-items:start}
+.empty{grid-column:1/-1;margin:0;padding:26px 22px;border:1px dashed var(--rule);border-radius:var(--r);color:var(--muted);text-align:center}
+.recipe{background:var(--surface);border-radius:var(--r);border:1px solid var(--rule);box-shadow:0 1px 0 rgba(60,40,20,.04);transition:box-shadow .2s,border-color .2s;scroll-margin-top:120px;overflow:hidden}
+.photo{position:relative;aspect-ratio:4/3;background:var(--paper);overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s}
+.recipe:hover .photo img{transform:scale(1.03)}
+.photo.none{background:repeating-linear-gradient(135deg,var(--paper) 0 10px,color-mix(in srgb,var(--rule) 55%,var(--paper)) 10px 20px);display:grid;place-items:center}
+.photo.none span{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.75rem;color:var(--muted);background:var(--surface);padding:6px 10px;border-radius:6px;max-width:80%;text-align:center}
+.photo .kind{position:absolute;left:14px;top:14px;font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--surface);color:var(--locked)}
+.shelf[data-status="tweaking"] .photo .kind{color:var(--tweak)}
+.recipe[open] .photo{aspect-ratio:21/9}
+.photo{grid-column:1/-1;margin:-22px -22px 10px;border-radius:0}
+@media (min-width:780px){.photo{margin:-26px -32px 12px}}
+.recipe:hover{border-color:color-mix(in srgb,var(--muted) 45%,var(--rule))}
+.recipe[open]{grid-column:1/-1;box-shadow:0 18px 50px -24px rgba(60,40,20,.28)}
+
+.shelf[data-status="tweaking"] .recipe{border:1.5px dashed color-mix(in srgb,var(--tweak) 55%,var(--rule))}
+.recipe summary{list-style:none;cursor:pointer;padding:22px 22px 20px;display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:start;border-radius:var(--r);-webkit-tap-highlight-color:transparent}
+.recipe summary::-webkit-details-marker{display:none}
+.recipe h3{font-family:var(--display);font-weight:400;font-size:1.375rem;line-height:1.2;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.recipe[open] h3{font-size:clamp(1.625rem,4.5vw,2.25rem)}
+.recipe .blurb{grid-column:1/-1;margin:0;color:var(--muted);text-wrap:pretty;max-width:62ch}
+.toggle{width:34px;height:34px;border-radius:50%;border:1px solid var(--rule);display:grid;place-items:center;position:relative;flex:none;transition:transform .25s,background .15s}
+.toggle::before,.toggle::after{content:"";position:absolute;width:12px;height:1.5px;background:var(--ink);border-radius:2px}
+.toggle::after{transform:rotate(90deg);transition:transform .25s}
+.recipe[open] .toggle{background:var(--ink)}
+.recipe[open] .toggle::before{background:var(--paper)}
+.recipe[open] .toggle::after{transform:rotate(0);background:var(--paper)}
+.facts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0;padding:0;list-style:none}
+.facts li{font-size:.8125rem;font-weight:500;padding:4px 11px;border-radius:999px;background:var(--paper);color:var(--muted)}
+.facts li.nut{color:var(--ink)}
+.body{padding:6px 22px 26px;border-top:1px solid var(--rule)}
+.cols{display:grid;gap:8px 48px}
+@media (min-width:780px){.cols{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}.cols .ing{position:sticky;top:120px;align-self:start}.body{padding:10px 32px 32px}.recipe summary{padding:26px 32px 22px}}
+.body h4{font-size:.75rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:26px 0 12px}
+.body h5{font-family:var(--display);font-weight:400;font-size:1.0625rem;margin:18px 0 6px}
+.body ul,.body ol{margin:0;padding:0;list-style:none}
+.ing li{border-bottom:1px solid var(--rule)}
+.ing li:last-child{border-bottom:0}
+.check{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;padding:10px 0;cursor:pointer;line-height:1.45;-webkit-tap-highlight-color:transparent}
+.check::before{content:"";flex:none;width:18px;height:18px;margin-top:1px;border:1.5px solid var(--muted);border-radius:5px;transition:background .15s,border-color .15s}
+.check[aria-pressed="true"]{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted)}
+.check[aria-pressed="true"]::before{background:var(--locked);border-color:var(--locked);box-shadow:inset 0 0 0 3px var(--surface)}
+.steps{counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:2.25rem 1fr;gap:4px;padding:0 0 18px}
+.steps li::before{content:counter(s);font-family:var(--display);font-size:1.5rem;line-height:1.1;color:var(--accent)}
+.steps .check{padding:0;display:block}
+.steps .check::before{display:none}
+.plain li{position:relative;padding:0 0 10px 20px;text-wrap:pretty}
+.plain li::before{content:"";position:absolute;left:2px;top:.68em;width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.extras{display:grid;gap:0 48px;margin-top:8px;border-top:1px solid var(--rule)}
+@media (min-width:780px){.extras.two{grid-template-columns:1fr 1fr}}
+.tweaks{background:var(--tweak-wash);border-radius:14px;padding:4px 20px 12px;margin-top:22px}
+.tweaks h4{color:var(--tweak)}
+.tweaks .plain li::before{background:var(--tweak)}
+.source{margin:24px 0 0;padding-top:18px;border-top:1px solid var(--rule);color:var(--muted);font-size:.9375rem}
+.est{margin:18px 0 0;color:var(--muted);font-size:.875rem;font-style:italic}
+.linkout{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:11px 20px;border-radius:999px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:500}
+.linkout:hover{color:var(--paper);background:var(--accent)}
+.foot{margin-top:72px;padding-top:20px;border-top:1px solid var(--rule);color:var(--muted);font-size:.9375rem;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+.foot p{margin:0}
+@media print{body{background:#fff}.tools,.toggle,.foot{display:none}.recipe{break-inside:avoid;box-shadow:none}.check::before{display:none}}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="masthead">
+<p class="eyebrow">Our recipe book</p>
+<h1>Chef It Up</h1>
+<p class="lede">The recipes we actually cook. High in protein, simple ingredients, restaurant quality at home.</p>
+<ul class="tally" id="tally"></ul>
+</header>
+<div class="tools" id="tools">
+<div class="search"><label for="q">Search recipes</label><input id="q" type="search" placeholder="Search by name or ingredient" autocomplete="off"></div>
+<div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
+</div>
+<main>
+<section class="shelf" data-status="locked" id="locked">
+<div class="shelf-head"><h2>Locked in</h2><p><span class="count" id="count-locked"></span> · Exactly how we like them.</p></div>
+<div class="list" id="list-locked"></div>
+</section>
+<section class="shelf" data-status="tweaking" id="tweaking">
+<div class="shelf-head"><h2>Still tweaking</h2><p><span class="count" id="count-tweaking"></span> · Good, not final yet.</p></div>
+<div class="list" id="list-tweaking"></div>
+</section>
+</main>
+<footer class="foot"><p id="updated"></p><p>Tap ingredients and steps to check them off.</p></footer>
+</div>
+<script>
+/* ------------------------------------------------------------------
+   RECIPES
+   To add one, copy a block below and change the values.
+   status: "locked"   = final, we don't change it
+           "tweaking" = good, still adjusting
+   To promote a recipe, change its status to "locked".
+   Use serves: "4" or makes: "1 loaf". kind is the tag (Breakfast, Main...).
+   linkOnly: true = just a link to the original, no ingredients or steps yet.
+   Optional fields: source, tweaks, notes, estimated, protein, calories.
+   image: "images/<name>.jpg" — save a photo into the images folder next
+   to this file (any JPG or PNG, landscape works best).
+------------------------------------------------------------------- */
+const UPDATED = "October 8, 2026";
+
+const RECIPES = [
+  {
+    id: "miso-lo-mein",
+    image: "images/miso-lo-mein.jpg",
+    title: "Chicken Miso Lo Mein",
+    status: "tweaking",
+    blurb: "Spaghetti tossed in a white miso and mushroom sauce with seared chicken, shiitake, bok choy, jammy eggs and garlic chips.",
+    kind: "Main",
+    serves: "2",
+    time: "45 min",
+    protein: "about 45 g protein",
+    calories: "about 700 cal",
+    estimated: true,
+    ingredients: [
+      { group: "Sauce", items: [
+        "2 tbsp white miso paste",
+        "1 tbsp light soy sauce",
+        "1/4 cup strained shiitake soaking liquid"
+      ]},
+      { group: "Everything else", items: [
+        "6 to 8 oz spaghetti",
+        "1 large chicken breast, sliced thin across the grain",
+        "1 tbsp light soy sauce, for the chicken",
+        "6 dried shiitake mushrooms",
+        "2 cups just-boiled water, for soaking",
+        "2 heads baby bok choy, halved and washed well",
+        "2 large eggs",
+        "5 garlic cloves: 3 thinly sliced, 2 minced",
+        "3 tbsp avocado oil (or any neutral oil)"
+      ]}
+    ],
+    steps: [
+      "Soak the shiitake in the just-boiled water for 30 minutes, with a small plate on top to keep them under.",
+      "Lower the eggs into already-boiling water and cook 7 minutes for jammy yolks. Move to an ice bath for at least 5 minutes, then peel from the wide end.",
+      "Slice the chicken about 1/4 inch thick and toss with 1 tbsp soy sauce.",
+      "Put the oil and sliced garlic in a cold pan, then heat on medium-low until the garlic is pale golden. Lift the chips out onto a paper towel and pour the garlic oil into a small bowl.",
+      "Squeeze the mushrooms dry, strain and keep the soaking liquid, trim the stems and slice the caps. Whisk the sauce until smooth.",
+      "Boil the spaghetti in unsalted water until just al dente, adding the bok choy for the last 2 minutes. Drain.",
+      "Sear the chicken in 1 tbsp of the garlic oil over high heat in a single layer, about 1 minute per side. Take it out.",
+      "Brown the mushrooms in the same pan for about 3 minutes, then add the minced garlic for 30 seconds.",
+      "Turn the heat to low. Add the spaghetti, bok choy, chicken and sauce and toss for about a minute until glossy. Loosen with a splash of mushroom liquid if it is tight.",
+      "Top with the halved eggs, garlic chips and a drizzle of garlic oil."
+    ],
+    notes: [
+      "Keep the heat low once the miso goes in. Cooking it hard dulls the flavor.",
+      "Taste before adding more soy. The miso is already salty.",
+      "Started as a miso ramen and became lo mein when we had no ramen noodles."
+    ],
+    tweaks: [
+      "Add 1 tbsp baking soda to the pasta water (big pot, it foams) for a springier, more lo mein-like noodle.",
+      "Try fresh ginger with the minced garlic.",
+      "Finish with sesame oil and sliced green onion."
+    ]
+  },
+  {
+    id: "ham-cheddar-chive-biscuits",
+    image: "images/ham-cheddar-chive-biscuits.jpg",
+    title: "Ham, Cheddar and Chive Cottage Cheese Biscuits",
+    status: "tweaking",
+    blurb: "Layered savory biscuits that hold well for a late breakfast. Delicious as is; we want more protein per calorie.",
+    kind: "Breakfast",
+    makes: "6 biscuits",
+    time: "50 min",
+    protein: "23.5 g protein",
+    calories: "402 cal",
+    ingredients: [
+      { group: "Wet", items: [
+        "1 cup cottage cheese",
+        "1/4 cup milk, plus more for brushing",
+        "1 tbsp zero-calorie brown sugar substitute (the original uses honey)",
+        "2 tbsp melted salted butter",
+        "7 oz deli ham, diced small",
+        "1 cup shredded sharp cheddar",
+        "1/3 cup diced green onion or chives"
+      ]},
+      { group: "Dry", items: [
+        "2 cups bread flour",
+        "1 tbsp baking powder",
+        "1/4 tsp baking soda",
+        "1 tsp sea salt",
+        "1/2 tsp black pepper"
+      ]}
+    ],
+    steps: [
+      "Heat the oven to 425°F and line a baking sheet with parchment.",
+      "Blend the cottage cheese and milk until creamy. Stir in the sweetener and melted butter, then fold in the ham, cheddar and green onion.",
+      "Mix the dry ingredients in a separate bowl, add to the wet and stir until just combined. The dough will look crumbly and a little dry.",
+      "Turn out onto a floured surface and bring it together with floured hands into a smooth dough.",
+      "Roll into a rough rectangle about 3/4 inch thick. Fold one end to the center and the other end over it, like a letter.",
+      "Flatten to 3/4 inch again and repeat the letter fold. This builds the layers.",
+      "Roll once more to press the layers together, cut into 6 biscuits and set them on the sheet almost touching.",
+      "Brush the tops with milk and bake 20 to 30 minutes, until lightly browned and set in the center. Rest 10 minutes."
+    ],
+    notes: [
+      "Nutrition is per biscuit at 6 per batch, from our tracking app.",
+      "Cutting the batch into 8 gives a smaller portion at the same ratio."
+    ],
+    tweaks: [
+      "Swap 1 cup of the bread flour for Kodiak mix and drop the baking powder to 2 tsp.",
+      "Use 2% sharp cheddar.",
+      "Cut the butter to 1 tbsp.",
+      "Raise the ham to 10 oz.",
+      "All four together should land near 380 cal and 28 g protein per biscuit (estimate). Log the real numbers after the first batch."
+    ]
+  },
+
+  /* ---------------- Locked in ---------------- */
+  {
+    id: "cottage-cheese-pumpkin-pancakes",
+    image: "images/pumpkin-pancakes.jpg",
+    title: "Cottage Cheese Pumpkin Pancakes",
+    status: "locked",
+    kind: "Breakfast",
+    blurb: "Blender pancakes with oats, pumpkin and cottage cheese. No flour, no added sugar.",
+    serves: "2",
+    time: "15 min",
+    protein: "20 g protein",
+    calories: "289 cal",
+    source: { label: "Laura Fuentes", url: "https://www.laurafuentes.com/cottage-cheese-pumpkin-pancakes/" },
+    ingredients: [
+      { items: [
+        "1/2 cup cottage cheese",
+        "1/2 cup pumpkin puree",
+        "2 large eggs",
+        "1 tsp vanilla (optional)",
+        "2 tsp baking powder (aluminum-free)",
+        "1 tsp pumpkin spice",
+        "1 cup old-fashioned oats"
+      ]}
+    ],
+    steps: [
+      "Add everything to a blender in the order listed and blend on high for a full minute, until smooth. The batter is very thick. Don't thin it.",
+      "Heat a nonstick griddle or large pan over medium-high and grease it.",
+      "Scoop 1/4 cup of batter per pancake and spread it out with the back of the scoop.",
+      "Cook about 2 minutes, until the edges set and a few bubbles show. Flip once and cook 2 minutes more. Don't press them down."
+    ],
+    notes: [
+      "A serving is 4 pancakes. Nutrition is from the original recipe, before toppings."
+    ]
+  },
+  {
+    id: "fluffy-french-toast",
+    image: "images/french-toast.jpg",
+    title: "Fluffy French Toast",
+    status: "locked",
+    kind: "Breakfast",
+    blurb: "Our usual French toast. A little flour in the batter makes the coating cling to the bread instead of the pan.",
+    serves: "6",
+    time: "25 min",
+    source: { label: "Allrecipes", url: "https://www.allrecipes.com/recipe/16895/fluffy-french-toast/" },
+    ingredients: [
+      { items: [
+        "1/4 cup all-purpose flour",
+        "1 cup milk",
+        "1 pinch salt",
+        "3 large eggs",
+        "1/2 tsp ground cinnamon",
+        "1 tsp vanilla extract",
+        "1 tbsp white sugar",
+        "12 thick slices bread (Texas toast works well)"
+      ]}
+    ],
+    steps: [
+      "Measure the flour into a large bowl. Slowly whisk in the milk, then whisk in the salt, eggs, cinnamon, vanilla and sugar until smooth.",
+      "Heat a lightly oiled griddle or frying pan over medium heat.",
+      "Soak the bread slices in the batter until saturated.",
+      "Cook each side until golden brown. Serve hot."
+    ],
+    notes: [
+      "A blender gets the flour fully mixed in if a whisk leaves lumps.",
+      "A serving is 2 slices."
+    ]
+  },
+  {
+    id: "cinnamon-maple-whiskey-sour",
+    image: "images/whiskey-sour.jpg",
+    title: "Cinnamon Maple Whiskey Sour",
+    status: "locked",
+    kind: "Drink",
+    blurb: "Bourbon, fresh lemon and maple syrup, shaken over ice.",
+    makes: "1 cocktail",
+    time: "5 min",
+    source: { label: "Cookie and Kate", url: "https://cookieandkate.com/cinnamon-maple-whiskey-sour-recipe/" },
+    ingredients: [
+      { items: [
+        "1 1/2 oz (3 tbsp) bourbon",
+        "1 oz (2 tbsp) fresh lemon juice",
+        "2 to 4 tsp maple syrup, to taste (3 tsp is the middle)",
+        "Pinch of ground cinnamon (optional)"
+      ]}
+    ],
+    steps: [
+      "Fill a shaker or mason jar about two-thirds with ice. Add everything, seal and shake well.",
+      "Strain into a glass over fresh ice."
+    ],
+    notes: [
+      "Multiply by up to 4 to shake a batch at once.",
+      "For a pitcher, scale to the number of drinks, chill, stir and pour over ice."
+    ]
+  },
+  {
+    id: "sweet-spicy-oven-ribs",
+    image: "images/oven-ribs.jpg",
+    title: "Sweet and Spicy Oven-Baked Ribs",
+    status: "locked",
+    kind: "Main",
+    blurb: "Baby backs baked low under foil until they pull from the bone, then sauced and broiled.",
+    serves: "4",
+    time: "3 hr 15 min",
+    source: { label: "Inspired Taste", url: "https://www.inspiredtaste.net/7179/sweet-and-spicy-oven-baked-ribs/" },
+    ingredients: [
+      { group: "Ribs", items: [
+        "2 to 2 1/2 lb baby back pork ribs"
+      ]},
+      { group: "Dry rub (our addition, replaces the plain salt and pepper)", items: [
+        "1 tbsp light brown sugar",
+        "2 tsp smoked paprika",
+        "1 1/2 tsp kosher salt",
+        "1 tsp garlic powder",
+        "1 tsp onion powder",
+        "1/2 tsp black pepper",
+        "1/2 tsp ground cumin",
+        "1/4 tsp cayenne"
+      ]},
+      { group: "Sauce", items: [
+        "1 tbsp olive oil",
+        "1/4 cup finely diced onion",
+        "1/2 tsp ground cumin",
+        "1/2 cup ketchup",
+        "1 tbsp hot chili sauce, such as Sriracha",
+        "2 tbsp light brown sugar",
+        "1 tbsp apple cider vinegar",
+        "Salt, to taste"
+      ]}
+    ],
+    steps: [
+      "Heat the oven to 275°F. Pull the thin membrane off the back of the ribs if it is still attached.",
+      "Mix the rub and coat both sides of the ribs. If there is time, let them sit 30 minutes.",
+      "Lay the ribs meaty side down in a rimmed pan, cutting the rack to fit if needed, and seal tightly with foil.",
+      "Bake 2 1/2 to 3 1/2 hours, checking from the 2-hour mark. They are done when a knife slides in with almost no resistance.",
+      "While they bake, make the sauce: soften the onion in the oil over medium heat, 5 to 8 minutes. Add the cumin for 30 seconds, then stir in the ketchup, chili sauce, brown sugar and vinegar. Salt to taste and simmer 2 minutes.",
+      "Take the ribs out, remove the foil and brush both sides generously with sauce.",
+      "Broil on high near the top of the oven for 3 to 4 minutes, until the sauce caramelizes. Watch closely."
+    ],
+    notes: [
+      "The rub is new and untested with this recipe. The original seasons with just salt and pepper. Adjust the cayenne and salt after the first rack."
+    ]
+  },
+  {
+    id: "easy-cajun-jambalaya",
+    image: "images/jambalaya.jpg",
+    title: "Easy Cajun Jambalaya",
+    status: "locked",
+    kind: "Main",
+    blurb: "Chicken and kielbasa jambalaya without the heavy kick. One pot, 45 minutes.",
+    serves: "8",
+    time: "45 min",
+    source: { label: "Allrecipes", url: "https://www.allrecipes.com/recipe/31833/easy-cajun-jambalaya/" },
+    ingredients: [
+      { items: [
+        "2 tsp olive oil",
+        "2 boneless, skinless chicken breasts, cut into bite-size pieces",
+        "8 oz kielbasa, diced",
+        "1 onion, diced",
+        "1 green bell pepper, diced",
+        "1/2 cup diced celery",
+        "2 tbsp chopped garlic",
+        "1/4 tsp cayenne pepper",
+        "1/2 tsp onion powder",
+        "Salt and black pepper, to taste",
+        "2 cups uncooked white rice",
+        "4 cups chicken stock",
+        "3 bay leaves",
+        "2 tsp Worcestershire sauce",
+        "1 tsp hot pepper sauce"
+      ]}
+    ],
+    steps: [
+      "Heat the oil in a large pot over medium-high. Sauté the chicken and kielbasa until lightly browned, about 5 minutes.",
+      "Stir in the onion, bell pepper, celery and garlic. Season with cayenne, onion powder, salt and pepper. Cook about 5 minutes, until the onion is soft and translucent.",
+      "Add the rice, then stir in the chicken stock and bay leaves.",
+      "Bring to a boil, then reduce the heat, cover and simmer 20 minutes, or until the rice is tender.",
+      "Stir in the Worcestershire and hot pepper sauce. Pull out the bay leaves before serving."
+    ]
+  },
+  {
+    id: "dutch-oven-bread",
+    image: "images/dutch-oven-bread.jpg",
+    title: "Dutch Oven No-Knead Bread",
+    status: "locked",
+    kind: "Bread",
+    blurb: "Four ingredients, five minutes of work, and a crackly crust.",
+    makes: "1 loaf",
+    time: "2 hr 45 min",
+    source: { label: "Bowl of Delicious", url: "https://www.bowlofdelicious.com/dutch-oven-bread/" },
+    ingredients: [
+      { items: [
+        "1 1/2 cups warm water (about 100°F)",
+        "1 packet yeast (2 1/4 tsp), any type",
+        "1 1/2 tsp fine salt, or 2 tsp kosher",
+        "3 1/4 cups all-purpose or bread flour, plus more for dusting"
+      ]}
+    ],
+    steps: [
+      "Whisk the warm water, yeast and salt in a large bowl.",
+      "Add all the flour and stir to a sticky, evenly wet dough. Adjust with a tablespoon or two of flour or water if needed.",
+      "Cover and let rise somewhere warm for 2 to 3 hours, until doubled.",
+      "Put the covered Dutch oven in the oven and heat to 450°F. Keep heating about 20 minutes after it reaches temperature.",
+      "Scrape the dough onto floured parchment, shape it gently into a round with a spatula and flip it floured side up. Slash the top about 1/2 inch deep if you like.",
+      "Lower the parchment and dough into the hot pot, put the lid on and bake 35 minutes.",
+      "Take the lid off and bake 5 to 10 minutes more, until golden brown.",
+      "Cool on a rack at least 10 minutes before slicing. Waiting 30 minutes or more gives a better crumb."
+    ],
+    notes: [
+      "The dough keeps in the fridge for up to 7 days and gets tangier. Bake cold dough 40 minutes covered.",
+      "Skip iodized salt. It can slow the rise and taste bitter.",
+      "If the bottom crust gets too hard, put a baking sheet on the rack below the pot."
+    ]
+  },
+  {
+    id: "carrot-cake-loaf",
+    image: "images/carrot-cake-loaf.jpg",
+    title: "Carrot Cake Loaf with Cream Cheese Frosting",
+    status: "locked",
+    kind: "Dessert",
+    blurb: "A one-bowl carrot cake baked in a loaf pan.",
+    makes: "1 loaf, about 14 slices",
+    time: "1 hr plus cooling",
+    source: { label: "Seasons and Suppers", url: "https://www.seasonsandsuppers.ca/carrot-cake-loaf/" },
+    ingredients: [
+      { group: "Loaf", items: [
+        "1 cup (125 g) all-purpose flour, spooned and leveled",
+        "1 tsp baking soda",
+        "1 tsp baking powder",
+        "1/2 tsp cinnamon",
+        "Pinch of salt",
+        "1 cup (200 g) granulated sugar",
+        "1/2 cup (120 ml) vegetable oil",
+        "1 1/2 cups (170 g) shredded carrot, well packed",
+        "2 large eggs",
+        "1 cup (100 g) finely chopped walnuts or pecans (optional)"
+      ]},
+      { group: "Frosting", items: [
+        "4 oz (113 g) cream cheese, room temperature",
+        "2 tbsp butter, room temperature",
+        "1 tsp vanilla extract",
+        "1 1/2 cups (195 g) powdered sugar"
+      ]}
+    ],
+    steps: [
+      "Grease a 9x5-inch metal loaf pan and line it with parchment, leaving overhang for lifting. Heat the oven to 350°F, regular bake (325°F for a glass pan).",
+      "Whisk the flour, baking soda, baking powder, cinnamon and salt.",
+      "Beat the sugar and oil for about a minute. Mix in the carrot, then the eggs, then the nuts. Stir in the dry ingredients until no flour shows. The batter will be loose.",
+      "Pour into the pan and bake 40 to 50 minutes, until a tester in the very center comes out clean.",
+      "Rest in the pan 15 minutes, lift out, peel off the parchment and cool completely on a rack.",
+      "Beat the cream cheese, butter and vanilla until smooth, then add the powdered sugar and beat until fluffy.",
+      "Frost only once the loaf is fully cool. Keep it in the fridge."
+    ],
+    notes: [
+      "Keeps refrigerated up to 4 days.",
+      "Raisins or coconut can stand in for the nuts, 1 cup."
+    ]
+  },
+  {
+    id: "caldo-de-res",
+    image: "images/caldo-de-res.jpg",
+    title: "Caldo de Res (Mexican Beef Soup)",
+    status: "locked",
+    kind: "Main",
+    blurb: "Bone-in beef shank simmered into broth, then loaded with corn, chayote, potato, carrot and cabbage.",
+    serves: "8",
+    time: "2 hr 30 min",
+    source: { label: "Allrecipes", url: "https://www.allrecipes.com/recipe/85055/caldo-de-res-mexican-beef-soup/" },
+    ingredients: [
+      { group: "Soup", items: [
+        "2 lb beef shank, with bone",
+        "1 tbsp vegetable oil",
+        "2 tsp salt",
+        "2 tsp ground black pepper",
+        "1 onion, chopped",
+        "3 cups beef broth",
+        "1 (14.5 oz) can diced tomatoes",
+        "4 cups water",
+        "2 medium carrots, coarsely chopped",
+        "1/4 cup chopped fresh cilantro",
+        "2 chayotes, quartered (optional)",
+        "2 ears corn, husked and cut into thirds",
+        "1 potato, quartered (optional)",
+        "1 medium head cabbage, cored and cut into wedges"
+      ]},
+      { group: "Garnishes", items: [
+        "1 cup chopped fresh cilantro",
+        "1/4 cup sliced pickled jalapeños",
+        "1/4 cup finely chopped onion",
+        "2 limes, cut into wedges",
+        "4 radishes, quartered"
+      ]}
+    ],
+    steps: [
+      "Cut the meat from the bones into about 1/2-inch pieces, leaving some on the bones.",
+      "Heat a heavy soup pot over medium-high until very hot. Add the oil, tilting to coat. Add the meat and bones, season with salt and pepper, and cook, stirring, until thoroughly browned.",
+      "Add the onion and cook until lightly browned. Stir in the broth and tomatoes. The liquid should cover the bones by 1/2 inch; add a little water if it does not.",
+      "Reduce the heat to low and simmer with the lid on loosely until the meat is tender, about 1 hour.",
+      "Pour in the 4 cups water and return to a simmer. Add the carrots and 1/4 cup cilantro and cook 10 minutes.",
+      "Stir in the chayote, corn and potato and simmer until tender. Push the cabbage wedges into the soup and cook until tender, about 10 minutes.",
+      "Ladle into large bowls with some meat, vegetables and bones in each. Garnish with cilantro, jalapeños and onion, squeeze lime over the top and serve with the radishes."
+    ]
+  },
+  {
+    id: "turkey-gravy",
+    image: "images/turkey-gravy.jpg",
+    title: "Turkey Gravy",
+    status: "locked",
+    kind: "Sauce",
+    blurb: "A butter and flour roux with drippings or stock. Works with or without a turkey.",
+    makes: "about 4 cups",
+    time: "15 min",
+    source: { label: "CenterCutCook", url: "https://www.centercutcook.com/perfect-turkey-gravy/" },
+    ingredients: [
+      { items: [
+        "1/2 cup butter, cut into 8 pieces",
+        "1 tsp coarse black pepper",
+        "1/2 cup all-purpose flour",
+        "4 cups pan drippings, or turkey or chicken stock",
+        "1 to 2 tsp Better Than Bouillon (only when using stock with no drippings)"
+      ]}
+    ],
+    steps: [
+      "If using drippings, strain them into a measuring cup, let the fat rise for a few minutes and skim it off. Top up with stock to reach 4 cups.",
+      "Melt the butter in a large saucepan over medium-low. Whisk in the pepper, then sprinkle in the flour and whisk constantly for 1 to 2 minutes to a smooth paste. Don't let it brown.",
+      "Pour in the liquid a little at a time, whisking the whole time so it stays smooth.",
+      "Raise the heat to medium and whisk until thickened, 3 to 5 minutes.",
+      "Taste and adjust the salt and pepper. Serve right away, or hold over very low heat and whisk now and then."
+    ],
+    notes: [
+      "Too thick: whisk in more stock. Too thin: simmer longer. Lumpy: strain it."
+    ]
+  }
+];
+
+/* ------------------------------------------------------------------
+   Rendering. Nothing below needs editing when adding recipes.
+------------------------------------------------------------------- */
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (k === "text") node.textContent = attrs[k];
+    else node.setAttribute(k, attrs[k]);
+  }
+  (children || []).forEach(function (c) { if (c) node.appendChild(c); });
+  return node;
+}
+function plain(items) { return el("ul", { class: "plain" }, items.map(function (t) { return el("li", { text: t }); })); }
+function checks(tag, cls, items) {
+  return el(tag, { class: cls }, items.map(function (t) {
+    return el("li", null, [el("button", { type: "button", class: "check", "aria-pressed": "false", text: t })]);
+  }));
+}
+function renderRecipe(r) {
+  const amount = r.makes ? "Makes " + r.makes : r.serves ? "Serves " + r.serves : null;
+  const facts = [];
+  [amount, r.time, r.linkOnly && "Link only"].filter(Boolean).forEach(function (f) { facts.push(el("li", { text: f })); });
+  [r.protein, r.calories].filter(Boolean).forEach(function (f) { facts.push(el("li", { class: "nut", text: f })); });
+
+  const photo = el("div", { class: "photo none" }, [el("span", { text: "photo: " + (r.image || "images/" + r.id + ".jpg") })]);
+  if (r.image) {
+    const img = new Image();
+    img.alt = r.title; img.loading = "lazy";
+    img.onload = function () { photo.classList.remove("none"); photo.textContent = ""; photo.appendChild(img); if (r.kind) photo.appendChild(el("span", { class: "kind", text: r.kind })); };
+    img.src = r.image;
+  }
+  if (r.kind) photo.appendChild(el("span", { class: "kind", text: r.kind }));
+
+  const summary = el("summary", null, [
+    photo,
+    el("h3", { text: r.title }),
+    el("span", { class: "toggle", "aria-hidden": "true" }),
+    r.blurb ? el("p", { class: "blurb", text: r.blurb }) : null,
+    facts.length ? el("ul", { class: "facts" }, facts) : null
+  ]);
+
+  const body = el("div", { class: "body" });
+  if (r.estimated) body.appendChild(el("p", { class: "est", text: "Protein and calories are rough estimates per serving, not tracked numbers." }));
+  if (r.linkOnly) {
+    body.appendChild(el("p", { class: "est", text: "The full recipe is on the original page for now. Ingredients and steps have not been copied in yet." }));
+    if (r.source && r.source.url) body.appendChild(el("a", { class: "linkout", href: r.source.url, rel: "noopener", target: "_blank", text: "Open on " + (r.source.label || "original site") + " →" }));
+  }
+
+  const hasIng = r.ingredients && r.ingredients.length, hasSteps = r.steps && r.steps.length;
+  if (hasIng || hasSteps) {
+    const ing = el("div", { class: "ing" });
+    if (hasIng) {
+      ing.appendChild(el("h4", { text: "Ingredients" }));
+      r.ingredients.forEach(function (g) {
+        if (typeof g === "string") { ing.appendChild(checks("ul", "", [g])); return; }
+        if (g.group) ing.appendChild(el("h5", { text: g.group }));
+        ing.appendChild(checks("ul", "", g.items));
+      });
+    }
+    const st = el("div", { class: "method" });
+    if (hasSteps) { st.appendChild(el("h4", { text: "Method" })); st.appendChild(checks("ol", "steps", r.steps)); }
+    body.appendChild(el("div", { class: "cols" }, [ing, st]));
+  }
+
+  const showTweaks = r.tweaks && r.tweaks.length && r.status === "tweaking";
+  if (r.notes && r.notes.length) {
+    body.appendChild(el("div", { class: "extras" }, [el("div", null, [el("h4", { text: "Notes" }), plain(r.notes)])]));
+  }
+  if (showTweaks) body.appendChild(el("div", { class: "tweaks" }, [el("h4", { text: "Tweaks to try next" }), plain(r.tweaks)]));
+  if (r.source && r.source.url && !r.linkOnly) {
+    const p = el("p", { class: "source", text: "Original recipe: " });
+    p.appendChild(el("a", { href: r.source.url, rel: "noopener", target: "_blank", text: r.source.label || r.source.url }));
+    body.appendChild(p);
+  }
+
+  const card = el("details", { class: "recipe", id: r.id }, [summary, body]);
+  card.dataset.kind = r.kind || "";
+  card.dataset.search = [r.title, r.kind || "", r.blurb || "",
+    (r.ingredients || []).map(function (g) { return typeof g === "string" ? g : g.items.join(" "); }).join(" ")
+  ].join(" ").toLowerCase();
+  return card;
+}
+
+const EMPTY = {
+  locked: "Nothing locked in yet. A recipe moves here once we stop changing it.",
+  tweaking: "Nothing in progress. Everything we cook is locked in."
+};
+let kindFilter = "All";
+const KINDS = ["All"].concat(Array.from(new Set(RECIPES.map(function (r) { return r.kind; }).filter(Boolean))).sort());
+
+function render() {
+  const query = document.getElementById("q").value;
+  const q = query.trim().toLowerCase();
+  ["locked", "tweaking"].forEach(function (status) {
+    const target = document.getElementById("list-" + status);
+    const all = RECIPES.filter(function (r) { return r.status === status; })
+      .sort(function (a, b) { return a.title.localeCompare(b.title); });
+    target.textContent = "";
+    let shown = 0;
+    all.forEach(function (r) {
+      if (kindFilter !== "All" && r.kind !== kindFilter) return;
+      const card = renderRecipe(r);
+      if (q && card.dataset.search.indexOf(q) === -1) return;
+      target.appendChild(card);
+      shown++;
+    });
+    const filtered = q || kindFilter !== "All";
+    if (!shown) target.appendChild(el("p", { class: "empty", text: filtered && all.length ? "No matches here" + (q ? " for “" + query.trim() + "”" : "") + "." : EMPTY[status] }));
+    document.getElementById("count-" + status).textContent = all.length === 1 ? "1 recipe" : all.length + " recipes";
+  });
+}
+
+function renderChips() {
+  const wrap = document.getElementById("chips");
+  wrap.textContent = "";
+  KINDS.forEach(function (k) {
+    const b = el("button", { type: "button", class: "chip", "aria-pressed": String(k === kindFilter), text: k });
+    b.addEventListener("click", function () { kindFilter = k; renderChips(); render(); });
+    wrap.appendChild(b);
+  });
+}
+
+function renderTally() {
+  const n = function (s) { return RECIPES.filter(function (r) { return r.status === s; }).length; };
+  const t = document.getElementById("tally");
+  [[RECIPES.length, "recipes"], [n("locked"), "locked in"], [n("tweaking"), "still tweaking"]].forEach(function (p) {
+    const li = el("li"); li.appendChild(el("b", { text: String(p[0]) })); li.appendChild(document.createTextNode(p[1])); t.appendChild(li);
+  });
+}
+
+function scrollToEl(node) {
+  const y = node.getBoundingClientRect().top + window.scrollY - 110;
+  window.scrollTo({ top: y, behavior: "smooth" });
+}
+
+function openFromHash() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return;
+  const target = document.getElementById(id);
+  if (target && target.tagName === "DETAILS") { target.open = true; scrollToEl(target); }
+}
+
+document.addEventListener("click", function (e) {
+  const c = e.target.closest(".check");
+  if (c) c.setAttribute("aria-pressed", c.getAttribute("aria-pressed") === "true" ? "false" : "true");
+});
+document.addEventListener("toggle", function (e) {
+  if (e.target.matches && e.target.matches("details.recipe") && e.target.open) {
+    history.replaceState(null, "", "#" + e.target.id);
+    setTimeout(function () { const r = e.target.getBoundingClientRect(); if (r.top < 90 || r.top > window.innerHeight * 0.5) scrollToEl(e.target); }, 30);
+  }
+}, true);
+const tools = document.getElementById("tools");
+window.addEventListener("scroll", function () { tools.classList.toggle("stuck", tools.getBoundingClientRect().top <= 0); }, { passive: true });
+document.getElementById("q").addEventListener("input", render);
+window.addEventListener("hashchange", openFromHash);
+window.addEventListener("beforeprint", function () {
+  document.querySelectorAll("details.recipe").forEach(function (d) { d.open = true; });
+});
+document.getElementById("updated").textContent = "Last updated " + UPDATED + ".";
+renderTally();
+renderChips();
+render();
+openFromHash();
+</script>
+</body>
+</html>

@@ -669,10 +669,51 @@ function renderRecipe(r) {
 
   const card = el("details", { class: "recipe", id: r.id }, [summary, body]);
   card.dataset.kind = r.kind || "";
-  card.dataset.search = [r.title, r.kind || "", r.blurb || "",
-    (r.ingredients || []).map(function (g) { return typeof g === "string" ? g : g.items.join(" "); }).join(" ")
-  ].join(" ").toLowerCase();
   return card;
+}
+
+/* ---- Search ----
+   Looks in the title, type, blurb, every ingredient, and the tweaks.
+   Ignores capitals, accents, punctuation and extra spaces, and the words
+   can be in any order. If nothing matches exactly, it retries loosely so a
+   small typo or a missing space ("bokchoy", "bok choi") still finds it. */
+function norm(s) {
+  return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, " ").trim();
+}
+const SEARCH = {};
+function searchData(r) {
+  if (!SEARCH[r.id]) {
+    const parts = [r.title, r.kind, r.blurb];
+    (r.ingredients || []).forEach(function (g) {
+      if (typeof g === "string") parts.push(g);
+      else { parts.push(g.group); (g.items || []).forEach(function (i) { parts.push(i); }); }
+    });
+    (r.tweaks || []).forEach(function (t) { parts.push(t); });
+    const text = norm(parts.filter(Boolean).join(" "));
+    SEARCH[r.id] = { text: text, words: text.split(" "), joined: text.replace(/ /g, "") };
+  }
+  return SEARCH[r.id];
+}
+function oneOff(a, b) {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, d = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++d > 1) return false;
+    if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+  }
+  return d + (a.length - i) + (b.length - j) <= 1;
+}
+function matches(r, q, loose) {
+  const s = searchData(r), words = q.split(" ");
+  if (words.every(function (w) { return s.text.indexOf(w) !== -1; })) return true;
+  if (!loose) return false;
+  const joined = q.replace(/ /g, "");
+  if (joined.length >= 5 && s.joined.indexOf(joined) !== -1) return true;
+  return words.every(function (w) {
+    return s.text.indexOf(w) !== -1 || (w.length >= 4 && s.words.some(function (x) { return oneOff(w, x); }));
+  });
 }
 
 const EMPTY = {
@@ -684,7 +725,9 @@ const KINDS = ["All"].concat(Array.from(new Set(RECIPES.map(function (r) { retur
 
 function render() {
   const query = document.getElementById("q").value;
-  const q = query.trim().toLowerCase();
+  const q = norm(query);
+  const inKind = function (r) { return kindFilter === "All" || r.kind === kindFilter; };
+  const loose = !!q && !RECIPES.some(function (r) { return inKind(r) && matches(r, q, false); });
   ["locked", "tweaking"].forEach(function (status) {
     const target = document.getElementById("list-" + status);
     const all = RECIPES.filter(function (r) { return r.status === status; })
@@ -692,14 +735,13 @@ function render() {
     target.textContent = "";
     let shown = 0;
     all.forEach(function (r) {
-      if (kindFilter !== "All" && r.kind !== kindFilter) return;
-      const card = renderRecipe(r);
-      if (q && card.dataset.search.indexOf(q) === -1) return;
-      target.appendChild(card);
+      if (!inKind(r)) return;
+      if (q && !matches(r, q, loose)) return;
+      target.appendChild(renderRecipe(r));
       shown++;
     });
     const filtered = q || kindFilter !== "All";
-    if (!shown) target.appendChild(el("p", { class: "empty", text: filtered && all.length ? "No matches here" + (q ? " for “" + query.trim() + "”" : "") + "." : EMPTY[status] }));
+    if (!shown) target.appendChild(el("p", { class: "empty", text: filtered && all.length ? "No matches here" + (q ? " for “" + query.trim() + "”" : "") + (kindFilter !== "All" ? " in " + kindFilter : "") + "." : EMPTY[status] }));
     document.getElementById("count-" + status).textContent = all.length === 1 ? "1 recipe" : all.length + " recipes";
   });
 }
@@ -746,7 +788,11 @@ document.addEventListener("toggle", function (e) {
 }, true);
 const tools = document.getElementById("tools");
 window.addEventListener("scroll", function () { tools.classList.toggle("stuck", tools.getBoundingClientRect().top <= 0); }, { passive: true });
-document.getElementById("q").addEventListener("input", render);
+document.getElementById("q").addEventListener("input", function (e) {
+  // Typing a search looks through every recipe, so clear any type filter first.
+  if (e.target.value.trim() && kindFilter !== "All") { kindFilter = "All"; renderChips(); }
+  render();
+});
 window.addEventListener("hashchange", openFromHash);
 window.addEventListener("beforeprint", function () {
   document.querySelectorAll("details.recipe").forEach(function (d) { d.open = true; });

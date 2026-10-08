@@ -109,6 +109,11 @@ button{font:inherit;color:inherit}
 .linkout:hover{color:var(--paper);background:var(--accent)}
 .foot{margin-top:72px;padding-top:20px;border-top:1px solid var(--rule);color:var(--muted);font-size:.9375rem;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
 .foot p{margin:0}
+.results{margin:20px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;color:var(--muted);scroll-margin-top:120px}
+.results[hidden]{display:none}
+.results strong{color:var(--ink);font-weight:600;margin-right:4px}
+.results a{display:inline-block;padding:7px 15px;border-radius:999px;background:var(--surface);border:1px solid var(--rule);color:var(--ink);text-decoration:none;font-weight:500;font-size:.9375rem}
+.results a:hover{border-color:var(--accent);color:var(--accent)}
 @media print{body{background:#fff}.tools,.toggle,.foot{display:none}.recipe{break-inside:avoid;box-shadow:none}.check::before{display:none}}
 </style>
 </head>
@@ -125,6 +130,7 @@ button{font:inherit;color:inherit}
 <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
 </div>
 <main>
+<p class="results" id="results" aria-live="polite" hidden></p>
 <section class="shelf" data-status="locked" id="locked">
 <div class="shelf-head"><h2>Locked in</h2><p><span class="count" id="count-locked"></span> · Exactly how we like them.</p></div>
 <div class="list" id="list-locked"></div>
@@ -158,12 +164,12 @@ const RECIPES = [
     image: "https://images.unsplash.com/photo-1634864572865-1cf8ff8bd23d?auto=format&fit=crop&w=1200&h=900&q=70",
     title: "Chicken Miso Lo Mein",
     status: "tweaking",
-    blurb: "Spaghetti tossed in a white miso and mushroom sauce with seared chicken, shiitake, bok choy, jammy eggs and garlic chips.",
+    blurb: "Spaghetti tossed in a white miso and mushroom sauce with seared chicken, shiitake, bok choy and garlic chips.",
     kind: "Main",
     serves: "2",
     time: "45 min",
-    protein: "about 45 g protein",
-    calories: "about 700 cal",
+    protein: "about 40 g protein",
+    calories: "about 650 cal",
     estimated: true,
     ingredients: [
       { group: "Sauce", items: [
@@ -178,14 +184,12 @@ const RECIPES = [
         "6 dried shiitake mushrooms",
         "2 cups just-boiled water, for soaking",
         "2 heads baby bok choy, halved and washed well",
-        "2 large eggs",
         "5 garlic cloves: 3 thinly sliced, 2 minced",
         "3 tbsp avocado oil (or any neutral oil)"
       ]}
     ],
     steps: [
       "Soak the shiitake in the just-boiled water for 30 minutes, with a small plate on top to keep them under.",
-      "Lower the eggs into already-boiling water and cook 7 minutes for jammy yolks. Move to an ice bath for at least 5 minutes, then peel from the wide end.",
       "Slice the chicken about 1/4 inch thick and toss with 1 tbsp soy sauce.",
       "Put the oil and sliced garlic in a cold pan, then heat on medium-low until the garlic is pale golden. Lift the chips out onto a paper towel and pour the garlic oil into a small bowl.",
       "Squeeze the mushrooms dry, strain and keep the soaking liquid, trim the stems and slice the caps. Whisk the sauce until smooth.",
@@ -193,7 +197,7 @@ const RECIPES = [
       "Sear the chicken in 1 tbsp of the garlic oil over high heat in a single layer, about 1 minute per side. Take it out.",
       "Brown the mushrooms in the same pan for about 3 minutes, then add the minced garlic for 30 seconds.",
       "Turn the heat to low. Add the spaghetti, bok choy, chicken and sauce and toss for about a minute until glossy. Loosen with a splash of mushroom liquid if it is tight.",
-      "Top with the halved eggs, garlic chips and a drizzle of garlic oil."
+      "Top with the garlic chips and a drizzle of garlic oil."
     ],
     notes: [
       "Keep the heat low once the miso goes in. Cooking it hard dulls the flavor.",
@@ -221,7 +225,7 @@ const RECIPES = [
       { group: "Wet", items: [
         "1 cup cottage cheese",
         "1/4 cup milk, plus more for brushing",
-        "1 tbsp zero-calorie brown sugar substitute (the original uses honey)",
+        "1 tbsp zero-calorie brown sugar substitute",
         "2 tbsp melted salted butter",
         "7 oz deli ham, diced small",
         "1 cup shredded sharp cheddar",
@@ -247,6 +251,7 @@ const RECIPES = [
     ],
     notes: [
       "Nutrition is per biscuit at 6 per batch, from our tracking app.",
+      "The original recipe sweetens with 1 tbsp of honey. We use the zero-calorie substitute instead.",
       "Cutting the batch into 8 gives a smaller portion at the same ratio."
     ],
     tweaks: [
@@ -673,10 +678,13 @@ function renderRecipe(r) {
 }
 
 /* ---- Search ----
-   Looks in the title, type, blurb, every ingredient, and the tweaks.
-   Ignores capitals, accents, punctuation and extra spaces, and the words
-   can be in any order. If nothing matches exactly, it retries loosely so a
-   small typo or a missing space ("bokchoy", "bok choi") still finds it. */
+   Looks ONLY at the recipe name, its type, and the lines in its ingredients
+   list. Descriptions, notes and "tweaks to try" are not searched, so a
+   recipe only comes up for things that are really in it.
+   Each word you type has to start a word in the recipe ("egg" finds "eggs",
+   but "ice" does not find "rice"). Capitals, accents, punctuation, extra
+   spaces and word order do not matter. If nothing matches, it retries
+   loosely so a typo or missing space ("bokchoy", "bok choi") still works. */
 function norm(s) {
   return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, " ").trim();
@@ -684,12 +692,11 @@ function norm(s) {
 const SEARCH = {};
 function searchData(r) {
   if (!SEARCH[r.id]) {
-    const parts = [r.title, r.kind, r.blurb];
+    const parts = [r.title, r.kind];
     (r.ingredients || []).forEach(function (g) {
       if (typeof g === "string") parts.push(g);
-      else { parts.push(g.group); (g.items || []).forEach(function (i) { parts.push(i); }); }
+      else (g.items || []).forEach(function (i) { parts.push(i); });
     });
-    (r.tweaks || []).forEach(function (t) { parts.push(t); });
     const text = norm(parts.filter(Boolean).join(" "));
     SEARCH[r.id] = { text: text, words: text.split(" "), joined: text.replace(/ /g, "") };
   }
@@ -705,14 +712,19 @@ function oneOff(a, b) {
   }
   return d + (a.length - i) + (b.length - j) <= 1;
 }
+function wordHit(q, w) {
+  // "egg" finds "eggs"; "eggs" also finds "egg".
+  return w.indexOf(q) === 0 || (q.length >= 4 && w.length >= 3 && q.indexOf(w) === 0 && q.length - w.length <= 2);
+}
 function matches(r, q, loose) {
   const s = searchData(r), words = q.split(" ");
-  if (words.every(function (w) { return s.text.indexOf(w) !== -1; })) return true;
+  const hit = function (w) { return s.words.some(function (x) { return wordHit(w, x); }); };
+  if (words.every(hit)) return true;
   if (!loose) return false;
   const joined = q.replace(/ /g, "");
   if (joined.length >= 5 && s.joined.indexOf(joined) !== -1) return true;
   return words.every(function (w) {
-    return s.text.indexOf(w) !== -1 || (w.length >= 4 && s.words.some(function (x) { return oneOff(w, x); }));
+    return hit(w) || (w.length >= 4 && (s.text.indexOf(w) !== -1 || s.words.some(function (x) { return oneOff(w, x); })));
   });
 }
 
@@ -728,6 +740,8 @@ function render() {
   const q = norm(query);
   const inKind = function (r) { return kindFilter === "All" || r.kind === kindFilter; };
   const loose = !!q && !RECIPES.some(function (r) { return inKind(r) && matches(r, q, false); });
+  const filtered = !!q || kindFilter !== "All";
+  const found = [];
   ["locked", "tweaking"].forEach(function (status) {
     const target = document.getElementById("list-" + status);
     const all = RECIPES.filter(function (r) { return r.status === status; })
@@ -738,11 +752,39 @@ function render() {
       if (!inKind(r)) return;
       if (q && !matches(r, q, loose)) return;
       target.appendChild(renderRecipe(r));
+      found.push(r);
       shown++;
     });
-    const filtered = q || kindFilter !== "All";
-    if (!shown) target.appendChild(el("p", { class: "empty", text: filtered && all.length ? "No matches here" + (q ? " for “" + query.trim() + "”" : "") + (kindFilter !== "All" ? " in " + kindFilter : "") + "." : EMPTY[status] }));
+    // While searching or filtering, a section with no matches is hidden, so
+    // results are never pushed down the page behind an empty section.
+    document.getElementById(status).hidden = filtered && !shown;
+    if (!shown && !filtered) target.appendChild(el("p", { class: "empty", text: EMPTY[status] }));
     document.getElementById("count-" + status).textContent = all.length === 1 ? "1 recipe" : all.length + " recipes";
+  });
+  renderResults(query.trim(), found, filtered);
+}
+
+// One line right under the search box saying what was found, with a link to each match.
+function renderResults(query, found, filtered) {
+  const box = document.getElementById("results");
+  box.textContent = "";
+  box.hidden = !filtered || (!query && found.length > 0);
+  if (box.hidden) return;
+  const what = (query ? " for “" + query + "”" : "") + (kindFilter !== "All" ? " in " + kindFilter : "");
+  if (!found.length) {
+    box.appendChild(el("span", { text: "No recipes" + what + ". Search looks at recipe names and ingredients." }));
+    return;
+  }
+  box.appendChild(el("strong", { text: (found.length === 1 ? "1 recipe" : found.length + " recipes") + what }));
+  if (found.length <= 6) found.forEach(function (r) {
+    const a = el("a", { href: "#" + r.id, text: r.title });
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      document.getElementById("q").blur();
+      const t = document.getElementById(r.id);
+      if (t) { t.open = true; scrollToEl(t); }
+    });
+    box.appendChild(a);
   });
 }
 
@@ -792,6 +834,10 @@ document.getElementById("q").addEventListener("input", function (e) {
   // Typing a search looks through every recipe, so clear any type filter first.
   if (e.target.value.trim() && kindFilter !== "All") { kindFilter = "All"; renderChips(); }
   render();
+  // Bring the results up under the search bar so they are not hidden below the keyboard.
+  if (e.target.value.trim() && tools.getBoundingClientRect().top > 8) {
+    window.scrollTo({ top: tools.getBoundingClientRect().top + window.scrollY, behavior: "instant" });
+  }
 });
 window.addEventListener("hashchange", openFromHash);
 window.addEventListener("beforeprint", function () {

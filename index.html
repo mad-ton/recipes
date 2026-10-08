@@ -619,7 +619,7 @@ function renderRecipe(r) {
   const photo = el("div", { class: "photo none" }, [el("span", { text: "photo: " + (r.image || "images/" + r.id + ".jpg") })]);
   if (r.image) {
     const img = new Image();
-    img.alt = r.title; img.loading = "lazy";
+    img.alt = r.title;
     img.onload = function () { photo.classList.remove("none"); photo.textContent = ""; photo.appendChild(img); if (r.kind) photo.appendChild(el("span", { class: "kind", text: r.kind })); };
     img.src = r.image;
   }

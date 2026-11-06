@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chef It Up</title>
-<meta name="description" content="Our recipe book: the recipes we cook on repeat, and the ones we are still dialing in.">
+<meta name="description" content="Our recipe book: the recipes we cook on repeat, the ones we are still dialing in, and the ones we saved to try.">
 <meta name="theme-color" content="#f5efe6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16120f" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Young+Serif&display=swap" rel="stylesheet">
 <style>
-:root{--paper:#f5efe6;--surface:#fffcf7;--ink:#241b14;--muted:#6e6052;--rule:#e4d9ca;--accent:#b0482a;--locked:#3f6a45;--locked-wash:#e5ede2;--tweak:#9a5c0c;--tweak-wash:#f6e9d3;--display:"Young Serif",Georgia,"Times New Roman",serif;--body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--r:18px}
-@media (prefers-color-scheme:dark){:root{--paper:#16120f;--surface:#201a16;--ink:#f1e9df;--muted:#ab9d8e;--rule:#352c25;--accent:#e2805f;--locked:#8cc596;--locked-wash:#1f2b21;--tweak:#e5ac5a;--tweak-wash:#30251a}}
+:root{--paper:#f5efe6;--surface:#fffcf7;--ink:#241b14;--muted:#6e6052;--rule:#e4d9ca;--accent:#b0482a;--locked:#3f6a45;--locked-wash:#e5ede2;--tweak:#9a5c0c;--tweak-wash:#f6e9d3;--try:#2f5f8a;--try-wash:#e3ebf3;--display:"Young Serif",Georgia,"Times New Roman",serif;--body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--r:18px}
+@media (prefers-color-scheme:dark){:root{--paper:#16120f;--surface:#201a16;--ink:#f1e9df;--muted:#ab9d8e;--rule:#352c25;--accent:#e2805f;--locked:#8cc596;--locked-wash:#1f2b21;--tweak:#e5ac5a;--tweak-wash:#30251a;--try:#7fb0e0;--try-wash:#1b2632}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
@@ -46,6 +46,7 @@ button{font:inherit;color:inherit}
 .shelf-head h2{font-family:var(--display);font-weight:400;font-size:clamp(1.75rem,5vw,2.375rem);line-height:1.05;letter-spacing:-.015em;margin:0;display:flex;align-items:center;gap:12px}
 .shelf-head h2::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--locked);flex:none}
 .shelf[data-status="tweaking"] .shelf-head h2::before{background:transparent;border:2px dashed var(--tweak)}
+.shelf[data-status="tryout"] .shelf-head h2::before{background:transparent;border:2px dotted var(--try)}
 .shelf-head p{margin:0;color:var(--muted)}
 .shelf-head .count{font-weight:500;color:var(--ink)}
 .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:22px;align-items:start}
@@ -58,6 +59,7 @@ button{font:inherit;color:inherit}
 .photo.none span{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.75rem;color:var(--muted);background:var(--surface);padding:6px 10px;border-radius:6px;max-width:80%;text-align:center}
 .photo .kind{position:absolute;left:14px;top:14px;font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--surface);color:var(--locked)}
 .shelf[data-status="tweaking"] .photo .kind{color:var(--tweak)}
+.shelf[data-status="tryout"] .photo .kind{color:var(--try)}
 .recipe[open] .photo{aspect-ratio:21/9}
 .photo{grid-column:1/-1;margin:-22px -22px 10px;border-radius:0}
 @media (min-width:780px){.photo{margin:-26px -32px 12px}}
@@ -65,6 +67,7 @@ button{font:inherit;color:inherit}
 .recipe[open]{grid-column:1/-1;box-shadow:0 18px 50px -24px rgba(60,40,20,.28)}
 
 .shelf[data-status="tweaking"] .recipe{border:1.5px dashed color-mix(in srgb,var(--tweak) 55%,var(--rule))}
+.shelf[data-status="tryout"] .recipe{border:1.5px dotted color-mix(in srgb,var(--try) 60%,var(--rule))}
 .recipe summary{list-style:none;cursor:pointer;padding:22px 22px 20px;display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:start;border-radius:var(--r);-webkit-tap-highlight-color:transparent}
 .recipe summary::-webkit-details-marker{display:none}
 .recipe h3{font-family:var(--display);font-weight:400;font-size:1.375rem;line-height:1.2;letter-spacing:-.01em;margin:0;text-wrap:balance}
@@ -103,6 +106,8 @@ button{font:inherit;color:inherit}
 .tweaks{background:var(--tweak-wash);border-radius:14px;padding:4px 20px 12px;margin-top:22px}
 .tweaks h4{color:var(--tweak)}
 .tweaks .plain li::before{background:var(--tweak)}
+.saved{background:var(--try-wash);border-radius:14px;padding:12px 18px;margin:0 0 18px;color:var(--muted);font-size:.9375rem;line-height:1.5}
+.saved b{color:var(--try);font-weight:600}
 .source{margin:24px 0 0;padding-top:18px;border-top:1px solid var(--rule);color:var(--muted);font-size:.9375rem}
 .est{margin:18px 0 0;color:var(--muted);font-size:.875rem;font-style:italic}
 .linkout{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:11px 20px;border-radius:999px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:500}
@@ -139,6 +144,10 @@ button{font:inherit;color:inherit}
 <div class="shelf-head"><h2>Still tweaking</h2><p><span class="count" id="count-tweaking"></span> · Good, not final yet.</p></div>
 <div class="list" id="list-tweaking"></div>
 </section>
+<section class="shelf" data-status="tryout" id="tryout">
+<div class="shelf-head"><h2>Try it out</h2><p><span class="count" id="count-tryout"></span> · Saved from social, not cooked yet.</p></div>
+<div class="list" id="list-tryout"></div>
+</section>
 </main>
 <footer class="foot"><p id="updated"></p><p>Tap ingredients and steps to check them off.</p><p>Stock photos from <a href="https://unsplash.com" rel="noopener" target="_blank">Unsplash</a>.</p></footer>
 </div>
@@ -148,10 +157,18 @@ button{font:inherit;color:inherit}
    To add one, copy a block below and change the values.
    status: "locked"   = final, we don't change it
            "tweaking" = good, still adjusting
+           "tryout"   = saved from a social post, not cooked yet. These are
+                        added automatically: drop a post link on the Reminders
+                        list "Recipes" and the entry appears here within about
+                        15 minutes, with a saved: { from, date, confidence,
+                        note } block saying where it came from. Once we cook
+                        it, change the status to "tweaking" or "locked" and
+                        delete the saved block.
    To promote a recipe, change its status to "locked".
    Use serves: "4" or makes: "1 loaf". kind is the tag (Breakfast, Main...).
    linkOnly: true = just a link to the original, no ingredients or steps yet.
-   Optional fields: source, tweaks, notes, estimated, protein, calories.
+   Optional fields: source, tweaks, notes, estimated, protein, carbs, fat,
+   calories, saved.
    image: a photo address. The current ones are free stock photos from
    Unsplash. To use your own, save it in the images folder and write
    image: "images/<name>.jpg" (any JPG or PNG, landscape works best).
@@ -615,11 +632,16 @@ function checks(tag, cls, items) {
     return el("li", null, [el("button", { type: "button", class: "check", "aria-pressed": "false", text: t })]);
   }));
 }
+function niceDate(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+  if (!m) return iso || "";
+  return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+}
 function renderRecipe(r) {
   const amount = r.makes ? "Makes " + r.makes : r.serves ? "Serves " + r.serves : null;
   const facts = [];
   [amount, r.time, r.linkOnly && "Link only"].filter(Boolean).forEach(function (f) { facts.push(el("li", { text: f })); });
-  [r.protein, r.calories].filter(Boolean).forEach(function (f) { facts.push(el("li", { class: "nut", text: f })); });
+  [r.protein, r.carbs, r.fat, r.calories].filter(Boolean).forEach(function (f) { facts.push(el("li", { class: "nut", text: f })); });
 
   const photo = el("div", { class: "photo none" }, [el("span", { text: "photo: " + (r.image || "images/" + r.id + ".jpg") })]);
   if (r.image) {
@@ -640,6 +662,12 @@ function renderRecipe(r) {
 
   const body = el("div", { class: "body" });
   if (r.estimated) body.appendChild(el("p", { class: "est", text: "Protein and calories are rough estimates per serving, not tracked numbers." }));
+  if (r.saved && r.status === "tryout") {
+    const s = el("p", { class: "saved" });
+    s.appendChild(el("b", { text: "Saved from " + (r.saved.from || "a post") + (r.saved.date ? " on " + niceDate(r.saved.date) : "") + "." }));
+    s.appendChild(document.createTextNode(" " + (r.saved.note || "Pulled automatically from the post. Check amounts before cooking.") + (r.saved.confidence ? " Read confidence: " + r.saved.confidence + "." : "")));
+    body.appendChild(s);
+  }
   if (r.linkOnly) {
     body.appendChild(el("p", { class: "est", text: "The full recipe is on the original page for now. Ingredients and steps have not been copied in yet." }));
     if (r.source && r.source.url) body.appendChild(el("a", { class: "linkout", href: r.source.url, rel: "noopener", target: "_blank", text: "Open on " + (r.source.label || "original site") + " →" }));
@@ -730,7 +758,8 @@ function matches(r, q, loose) {
 
 const EMPTY = {
   locked: "Nothing locked in yet. A recipe moves here once we stop changing it.",
-  tweaking: "Nothing in progress. Everything we cook is locked in."
+  tweaking: "Nothing in progress. Everything we cook is locked in.",
+  tryout: "Nothing saved to try. Drop a recipe post on the Recipes list and it shows up here."
 };
 let kindFilter = "All";
 const KINDS = ["All"].concat(Array.from(new Set(RECIPES.map(function (r) { return r.kind; }).filter(Boolean))).sort());
@@ -742,10 +771,17 @@ function render() {
   const loose = !!q && !RECIPES.some(function (r) { return inKind(r) && matches(r, q, false); });
   const filtered = !!q || kindFilter !== "All";
   const found = [];
-  ["locked", "tweaking"].forEach(function (status) {
+  ["locked", "tweaking", "tryout"].forEach(function (status) {
     const target = document.getElementById("list-" + status);
     const all = RECIPES.filter(function (r) { return r.status === status; })
-      .sort(function (a, b) { return a.title.localeCompare(b.title); });
+      .sort(function (a, b) {
+        // Saved-to-try recipes: newest first. Everything else: by name.
+        if (status === "tryout") {
+          const da = (a.saved && a.saved.date) || "", db = (b.saved && b.saved.date) || "";
+          if (da !== db) return db < da ? -1 : 1;
+        }
+        return a.title.localeCompare(b.title);
+      });
     target.textContent = "";
     let shown = 0;
     all.forEach(function (r) {
@@ -801,7 +837,7 @@ function renderChips() {
 function renderTally() {
   const n = function (s) { return RECIPES.filter(function (r) { return r.status === s; }).length; };
   const t = document.getElementById("tally");
-  [[RECIPES.length, "recipes"], [n("locked"), "locked in"], [n("tweaking"), "still tweaking"]].forEach(function (p) {
+  [[RECIPES.length, "recipes"], [n("locked"), "locked in"], [n("tweaking"), "still tweaking"], [n("tryout"), "to try"]].forEach(function (p) {
     const li = el("li"); li.appendChild(el("b", { text: String(p[0]) })); li.appendChild(document.createTextNode(p[1])); t.appendChild(li);
   });
 }
